@@ -21,7 +21,18 @@ fi
 echo "进入后端目录..."
 cd backend
 
-# 编译并通过 Jetty 启动后端服务
-echo "编译并通过 Jetty 启动后端服务..."
-mvn clean package
-mvn -f backend/pom.xml jetty:run
+# 编译 WAR
+echo "编译 WAR..."
+mvn -f backend/pom.xml -DskipTests clean package
+
+# 尝试部署到本地 Tomcat
+if [ -n "$CATALINA_HOME" ]; then
+  echo "检测到 CATALINA_HOME=$CATALINA_HOME"
+  echo "复制 WAR 到 Tomcat webapps 目录..."
+  cp -f backend/target/grade-management-system-1.0.0.war "$CATALINA_HOME/webapps/grade-management-system.war"
+  echo "启动 Tomcat..."
+  "$CATALINA_HOME/bin/startup.sh"
+else
+  echo "未检测到 CATALINA_HOME 环境变量。"
+  echo "请将 backend/target/grade-management-system-1.0.0.war 部署到 Tomcat 的 webapps 目录后启动 Tomcat。"
+fi
