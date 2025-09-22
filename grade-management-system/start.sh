@@ -21,6 +21,7 @@ fi
 echo "进入后端目录..."
 cd backend
 
-# 编译并启动后端服务
-echo "编译并启动后端服务..."
-mvn clean spring-boot:run
+# 编译并通过 Jetty 启动后端服务
+echo "编译并通过 Jetty 启动后端服务..."
+mvn clean package
+mvn -f backend/pom.xml jetty:run

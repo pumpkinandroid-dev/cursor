@@ -21,7 +21,8 @@ if %errorlevel% neq 0 (
 echo 进入后端目录...
 cd backend
 
-echo 编译并启动后端服务...
-mvn clean spring-boot:run
+echo 编译并通过 Jetty 启动后端服务...
+mvn clean package
+mvn -f backend/pom.xml jetty:run
 
 pause
