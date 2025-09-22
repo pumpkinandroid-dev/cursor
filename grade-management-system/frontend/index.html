@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成绩管理系统</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1><i class="fas fa-graduation-cap"></i> 成绩管理系统</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="showAddStudentModal()">
+                    <i class="fas fa-user-plus"></i> 添加学生
+                </button>
+                <button class="btn btn-success" onclick="showAddGradeModal()">
+                    <i class="fas fa-plus"></i> 添加成绩
+                </button>
+            </div>
+        </header>
+
+        <!-- 导航标签 -->
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="switchTab('students')">
+                <i class="fas fa-users"></i> 学生管理
+            </button>
+            <button class="tab-btn" onclick="switchTab('grades')">
+                <i class="fas fa-chart-line"></i> 成绩管理
+            </button>
+            <button class="tab-btn" onclick="switchTab('statistics')">
+                <i class="fas fa-chart-bar"></i> 统计分析
+            </button>
+        </nav>
+
+        <!-- 学生管理页面 -->
+        <div id="students-tab" class="tab-content active">
+            <div class="search-bar">
+                <input type="text" id="studentSearch" placeholder="搜索学生（学号、姓名、班级）" onkeyup="searchStudents()">
+                <button class="btn btn-secondary" onclick="searchStudents()">
+                    <i class="fas fa-search"></i> 搜索
+                </button>
+                <button class="btn btn-outline" onclick="clearStudentSearch()">
+                    <i class="fas fa-times"></i> 清除
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>班级</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- 学生数据将通过JavaScript动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 成绩管理页面 -->
+        <div id="grades-tab" class="tab-content">
+            <div class="filters">
+                <select id="gradeStudentFilter" onchange="filterGrades()">
+                    <option value="">所有学生</option>
+                </select>
+                <select id="gradeSubjectFilter" onchange="filterGrades()">
+                    <option value="">所有科目</option>
+                </select>
+                <select id="gradeSemesterFilter" onchange="filterGrades()">
+                    <option value="">所有学期</option>
+                </select>
+                <input type="text" id="gradeSearch" placeholder="搜索成绩" onkeyup="searchGrades()">
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>科目</th>
+                            <th>成绩</th>
+                            <th>学期</th>
+                            <th>考试类型</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gradesTableBody">
+                        <!-- 成绩数据将通过JavaScript动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 统计分析页面 -->
+        <div id="statistics-tab" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalStudents">0</h3>
+                        <p>学生总数</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalGrades">0</h3>
+                        <p>成绩记录</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="averageScore">0</h3>
+                        <p>平均分</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="maxScore">0</h3>
+                        <p>最高分</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>班级成绩分布</h3>
+                    <canvas id="classChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>科目成绩分布</h3>
+                    <canvas id="subjectChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加学生模态框 -->
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加学生</h2>
+                <span class="close" onclick="closeModal('addStudentModal')">&times;</span>
+            </div>
+            <form id="addStudentForm">
+                <div class="form-group">
+                    <label for="studentId">学号 *</label>
+                    <input type="text" id="studentId" name="studentId" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentName">姓名 *</label>
+                    <input type="text" id="studentName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="className">班级 *</label>
+                    <input type="text" id="className" name="className" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addStudentModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 编辑学生模态框 -->
+    <div id="editStudentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑学生</h2>
+                <span class="close" onclick="closeModal('editStudentModal')">&times;</span>
+            </div>
+            <form id="editStudentForm">
+                <input type="hidden" id="editStudentId" name="id">
+                <div class="form-group">
+                    <label for="editStudentIdField">学号 *</label>
+                    <input type="text" id="editStudentIdField" name="studentId" required>
+                </div>
+                <div class="form-group">
+                    <label for="editStudentName">姓名 *</label>
+                    <input type="text" id="editStudentName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editClassName">班级 *</label>
+                    <input type="text" id="editClassName" name="className" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editStudentModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">更新</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加成绩模态框 -->
+    <div id="addGradeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加成绩</h2>
+                <span class="close" onclick="closeModal('addGradeModal')">&times;</span>
+            </div>
+            <form id="addGradeForm">
+                <div class="form-group">
+                    <label for="gradeStudentId">学号 *</label>
+                    <select id="gradeStudentId" name="studentId" required>
+                        <option value="">请选择学生</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gradeSubject">科目 *</label>
+                    <input type="text" id="gradeSubject" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label for="gradeScore">成绩 *</label>
+                    <input type="number" id="gradeScore" name="score" min="0" max="100" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="gradeSemester">学期 *</label>
+                    <input type="text" id="gradeSemester" name="semester" required>
+                </div>
+                <div class="form-group">
+                    <label for="gradeExamType">考试类型</label>
+                    <select id="gradeExamType" name="examType">
+                        <option value="期中考试">期中考试</option>
+                        <option value="期末考试">期末考试</option>
+                        <option value="平时成绩">平时成绩</option>
+                        <option value="实验成绩">实验成绩</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addGradeModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 编辑成绩模态框 -->
+    <div id="editGradeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑成绩</h2>
+                <span class="close" onclick="closeModal('editGradeModal')">&times;</span>
+            </div>
+            <form id="editGradeForm">
+                <input type="hidden" id="editGradeId" name="id">
+                <div class="form-group">
+                    <label for="editGradeStudentId">学号 *</label>
+                    <select id="editGradeStudentId" name="studentId" required>
+                        <option value="">请选择学生</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editGradeSubject">科目 *</label>
+                    <input type="text" id="editGradeSubject" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label for="editGradeScore">成绩 *</label>
+                    <input type="number" id="editGradeScore" name="score" min="0" max="100" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="editGradeSemester">学期 *</label>
+                    <input type="text" id="editGradeSemester" name="semester" required>
+                </div>
+                <div class="form-group">
+                    <label for="editGradeExamType">考试类型</label>
+                    <select id="editGradeExamType" name="examType">
+                        <option value="期中考试">期中考试</option>
+                        <option value="期末考试">期末考试</option>
+                        <option value="平时成绩">平时成绩</option>
+                        <option value="实验成绩">实验成绩</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editGradeModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">更新</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 加载提示 -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>加载中...</p>
+    </div>
+
+    <!-- 消息提示 -->
+    <div id="message" class="message"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
