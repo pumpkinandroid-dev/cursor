@@ -1,0 +1,5 @@
+com\cnbeta\summary\ApiServlet$ArticleSummary.class
+com\cnbeta\summary\App.class
+com\cnbeta\summary\StaticFileServlet.class
+com\cnbeta\summary\ApiServlet$ErrorResponse.class
+com\cnbeta\summary\ApiServlet.class
