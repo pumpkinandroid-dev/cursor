@@ -28,7 +28,7 @@
         h.href = item.url;
         h.textContent = item.title || '(无标题)';
         h.style.display = 'block';
-        h.style.fontSize = '30px';
+        h.style.fontSize = '24px';
         h.target = '_blank';
         wrap.appendChild(h);
 
@@ -39,7 +39,7 @@
 
         const sum = document.createElement('div');
         sum.textContent = item.summary || '';
-        sum.style.fontSize = '20px';
+        sum.style.fontSize = '14px';
         wrap.appendChild(sum);
 
         const spacer = document.createElement('div');
