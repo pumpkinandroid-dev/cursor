@@ -39,7 +39,7 @@
 
         const sum = document.createElement('div');
         sum.textContent = item.summary || '';
-        sum.style.fontSize = '14px';
+        sum.style.fontSize = '18px';
         wrap.appendChild(sum);
 
         const spacer = document.createElement('div');
